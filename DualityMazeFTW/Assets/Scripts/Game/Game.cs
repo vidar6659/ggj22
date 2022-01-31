@@ -9,6 +9,7 @@ public class Game : MonoBehaviour
     public GameObject tilePrefab;
     public GameObject bobPrefab;
     public GameObject exitPrefab;
+    public Material mirrorTileMat;
 
     private Player player;
 
@@ -16,7 +17,7 @@ public class Game : MonoBehaviour
     {
         levelManager = new LevelManager();
         levelManager.LoadLevel();
-        levelManager.CreateLevel(tilePrefab, bobPrefab, exitPrefab);
+        levelManager.CreateLevel(tilePrefab, bobPrefab, exitPrefab, mirrorTileMat);
         player = new Player(levelManager);
     }
     
@@ -28,5 +29,10 @@ public class Game : MonoBehaviour
     void Act()
     {
         player.Act();
+    }
+
+    public void EndLevel()
+    {
+
     }
 }

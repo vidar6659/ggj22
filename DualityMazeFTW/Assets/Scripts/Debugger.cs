@@ -9,8 +9,8 @@ public class Debugger : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.magenta;
-        Gizmos.DrawSphere(pathEndPos, 1);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireCube(pathEndPos, new Vector3(2f, 2f, 2f));
         Gizmos.color = Color.red;
         if(pathCorners != null)
         {
