@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Player
 {
@@ -19,9 +20,11 @@ public class Player
 
     public void Act()
     {
-
         if (Input.GetMouseButtonUp(0))
         {
+            if (Game.isGamePaused)
+                return;
+
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out hit))
             {

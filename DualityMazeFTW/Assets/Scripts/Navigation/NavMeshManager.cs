@@ -87,6 +87,4 @@ public static class NavMeshManager
         //}
         bobsNavMeshAgent.SetDestination(dest);
     }
-
-
 }

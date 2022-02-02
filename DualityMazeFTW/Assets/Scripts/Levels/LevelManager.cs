@@ -160,7 +160,6 @@ public class LevelManager
 
     private void CloneMemoLogicLevel()
     {
-        //memoLevel = logicLevel;
         for (int i = 0; i < logicLevel.Length; i++)
         {
             for (int j = 0; j < logicLevel[i].Length; j++)

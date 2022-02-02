@@ -21,6 +21,7 @@ public class MenuManager : MonoBehaviour
         tempPanelsPos = mainPanel.transform.position;
         mainPanel.transform.position = loadingPanel.transform.position;
         loadingPanel.transform.position = tempPanelsPos;
+        Game.StartLevel();
         transform.GetComponent<AsyncLoading>().LoadSceneAsync("GameScene");
     }
 
