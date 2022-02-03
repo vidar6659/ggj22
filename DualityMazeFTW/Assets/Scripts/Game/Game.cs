@@ -14,9 +14,11 @@ public class Game : MonoBehaviour
     public static bool isGamePaused = false;
     public static bool isLevelCompleted = false;
 
+    public int numberOfLevels;
+
     void Start()
     {
-        levelManager = new LevelManager();
+        levelManager = new LevelManager(numberOfLevels);
         levelManager.LoadLevel();
         levelManager.CreateLevel(tilePrefab, bobPrefab, exitPrefab, mirrorTileMat);
         player = new Player(levelManager);
@@ -45,10 +47,20 @@ public class Game : MonoBehaviour
         Time.timeScale = (pauseGame) ? 0f : 1f;
     }
 
+    public static void SetLevelIsCompleted(bool isLevelComp)
+    {
+        isLevelCompleted = isLevelComp;
+    }
+
     public static void EndLevel()
     {
         isGamePaused = true;
         isLevelCompleted = true;
         GameObject.Find("Canvas").GetComponent<InGameMenuManager>().LoadEndPanel();
+    }
+
+    public void NextLevel()
+    {
+        levelManager.ChangeToNextLevel();
     }
 }

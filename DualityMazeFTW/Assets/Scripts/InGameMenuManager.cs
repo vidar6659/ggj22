@@ -48,4 +48,15 @@ public class InGameMenuManager : MonoBehaviour
     {
         SceneManager.LoadScene("MainScene");
     }
+
+    public void NextLevel()
+    {
+        GameObject.Find("GameManager").GetComponent<Game>().NextLevel();
+        tempPanelsPos = endPanel.transform.position;
+        endPanel.transform.position = inGamePanel.transform.position;
+        inGamePanel.transform.position = tempPanelsPos;
+        endPanel.SetActive(false);
+        Game.SetLevelPauseStatus(false);
+        Game.SetLevelIsCompleted(false);
+    }
 }

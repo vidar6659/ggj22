@@ -21,17 +21,35 @@ public class LevelManager
     int levelWidth;
     int levelHeight;
     int xRoot = 0;
+    int numberOfLevels;
+    int indexLevels;
 
-    public LevelManager()
+    GameObject bobRef;
+    GameObject exitRef;
+    List<GameObject> tilesRef = new List<GameObject>();
+
+    GameObject tilePrefab;
+    GameObject bobPrefab;
+    GameObject exitPrefab;
+    Material mirrorTileMat;
+
+    public LevelManager(int number)
     {
         path = Application.dataPath + "/levels/" + "lvl_000.txt";
         tilePosition = new Vector3(0f, 0.1f, 0f);
+        numberOfLevels = number;
+        indexLevels = 0;
         Debug.Log(path);
     }
 
-    private void ChangeFile(string file)
+    private void ChangeFile()
     {
-        path = Application.dataPath + "/levels/" + file;
+        string zeros = "";
+        if (indexLevels < 10)
+            zeros = "00";
+        else if (indexLevels < 100)
+            zeros = "";
+        path = Application.dataPath + "/levels/lvl_" + zeros + indexLevels + ".txt";
     }
 
     public void LoadLevel()
@@ -54,6 +72,7 @@ public class LevelManager
             }
             SetInitialPosition();
         }
+        indexLevels++;
     }
 
     private void SetInitialPosition()
@@ -64,17 +83,23 @@ public class LevelManager
         tilePosition.z = -(zRoot * offset);
     }
 
-    public void CreateLevel(GameObject tilePrefab, GameObject bobPrefab, GameObject exitPrefab, Material mirrorTileMat)
+    public void CreateLevel(GameObject _tilePrefab, GameObject _bobPrefab, GameObject _exitPrefab, Material _mirrorTileMat)
     {
+        tilePrefab = _tilePrefab;
+        bobPrefab = _bobPrefab;
+        exitPrefab = _exitPrefab;
+        mirrorTileMat = _mirrorTileMat;
+
         for (int i = 0; i < logicLevel.Length; i++)
         {
             for (int j = 0; j < logicLevel[i].Length; j++)
             {
-                GameObject tile = GameObject.Instantiate(tilePrefab);
+                GameObject tile = GameObject.Instantiate(_tilePrefab);
                 tile.transform.position = tilePosition;
                 tile.transform.name = j.ToString() + "," + i.ToString();
                 tile.GetComponent<Tile>().DefineTileStatus(logicLevel[i][j]);
                 tile.GetComponent<Tile>().SetCoord(j, i);
+                tilesRef.Add(tile);
                 if (j >= levelWidth/2)
                 {
                     tile.transform.GetChild(0).GetComponent<MeshRenderer>().materials[1].SetColor("_Color", new Color(0.245283f, 0.245283f, 0.245283f));
@@ -82,22 +107,24 @@ public class LevelManager
 
                 if (logicLevel[i][j] == 2) //player
                 {
-                    GameObject bob = GameObject.Instantiate(bobPrefab);
+                    GameObject bob = GameObject.Instantiate(_bobPrefab);
                     bob.transform.name = "Bob";
-                    Vector3 bobPosition = new Vector3(tilePosition.x, bob.transform.localScale.y/2, tilePosition.z);
+                    Vector3 bobPosition = new Vector3(tilePosition.x, bob.transform.localScale.y / 2, tilePosition.z);
                     bob.transform.position = bobPosition;
                     playerCoord.x = j;
                     playerCoord.y = i;
+                    bobRef = bob;
                 }
                 else if (logicLevel[i][j] == 3) //exit
                 {
-                    GameObject exit = GameObject.Instantiate(exitPrefab);
+                    GameObject exit = GameObject.Instantiate(_exitPrefab);
                     exit.transform.name = "Exit";
                     //exitPosition = new Vector3(tilePosition.x, exit.transform.localScale.y / 2, tilePosition.z);
                     exitPosition = new Vector3(tilePosition.x, tilePosition.y, tilePosition.z);
                     exit.transform.position = exitPosition;
                     exitCoord.x = j;
                     exitCoord.y = i;
+                    exitRef = exit;
                 }
                 tilePosition.x += offset;
             }
@@ -172,5 +199,33 @@ public class LevelManager
     private bool InsideBoundaries(int x, int y)
     {
         return (x >= 0 && x < memoLevel[0].Length && y >= 0 && y < memoLevel.Length);
+    }
+
+    public void ClearLevel()
+    {
+        GameObject.Destroy(bobRef);
+        GameObject.Destroy(exitRef);
+        foreach (GameObject t in tilesRef)
+        {
+            GameObject.Destroy(t);
+        }
+        tilesRef.Clear();
+    }
+
+    public bool ChangeToNextLevel()
+    {
+        if(indexLevels <= numberOfLevels - 1)
+        {
+            ClearLevel();
+            ChangeFile();
+            LoadLevel();
+            CreateLevel(tilePrefab, bobPrefab, exitPrefab, mirrorTileMat);
+            return true;
+        }
+        else
+        {
+            Debug.Log("Not enough levels");
+        }
+        return false;
     }
 }
