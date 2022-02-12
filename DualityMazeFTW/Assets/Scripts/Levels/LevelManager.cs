@@ -68,7 +68,6 @@ public class LevelManager
                 logicLevel[i] = new int[lines[i].Split(',').Length];
                 memoLevel[i] = new int[lines[i].Split(',').Length];
                 logicLevel[i] = Array.ConvertAll(lines[i].Split(','), t => Int32.Parse(t));
-                
             }
             SetInitialPosition();
         }
@@ -133,6 +132,7 @@ public class LevelManager
         }
         NavMeshManager.CreateNavMesh();
 
+        PrintLogicAndMemoLevels();
     }
 
     public Vector2 MirrorAction(Vector2 coord, bool block)
@@ -159,6 +159,7 @@ public class LevelManager
         //NavMeshManager.UpdateNavMesh();
         //NavMeshManager.UpdateNavMesh(coord, mCoord);
         CloneMemoLogicLevel();
+        PrintLogicAndMemoLevels();
         bool pathFound = IsPathToDestFound((int)playerCoord.x, (int)playerCoord.y);
         if(pathFound)
             NavMeshManager.SetBobsDestination(exitPosition);
@@ -209,7 +210,9 @@ public class LevelManager
         {
             GameObject.Destroy(t);
         }
+        Debug.Log("tilesRef.Length before clear: " + tilesRef.Count);
         tilesRef.Clear();
+        Debug.Log("tilesRef.Length after clear: " + tilesRef.Count);
     }
 
     public bool ChangeToNextLevel()
@@ -227,5 +230,15 @@ public class LevelManager
             Debug.Log("Not enough levels");
         }
         return false;
+    }
+
+    private void PrintLogicAndMemoLevels()
+    {
+        string levelsString = "";
+
+        for (int i = 0; i < logicLevel.Length; i++)
+            levelsString += String.Join("|", logicLevel[i]) + "\t" + String.Join("|", memoLevel[i]) + "\n";
+
+        Debug.Log("logicLevel:\tmemoLevel:\n" + levelsString);
     }
 }

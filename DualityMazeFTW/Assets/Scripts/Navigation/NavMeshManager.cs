@@ -10,6 +10,7 @@ public static class NavMeshManager
     public static void CreateNavMesh()
     {
         tiles = GameObject.FindGameObjectsWithTag("NavMeshTile");
+        Debug.Log("Number of Tiles to Build NavMesh: " + tiles.Length);
         foreach (var t in tiles)
         {
             t.GetComponent<NavMeshSurface>().BuildNavMesh();
