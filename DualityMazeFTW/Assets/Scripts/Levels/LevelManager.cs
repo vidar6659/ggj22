@@ -15,6 +15,7 @@ public class LevelManager
     Vector2 exitCoord;
     Vector2 playerCoord;
     int[][] memoLevel;
+    List<Vector2> pathToExit = new List<Vector2>();
 
     const int WIDTH = 17;
     const int HEIGHT = 10;
@@ -160,28 +161,44 @@ public class LevelManager
         //NavMeshManager.UpdateNavMesh(coord, mCoord);
         CloneMemoLogicLevel();
         PrintLogicAndMemoLevels();
-        bool pathFound = IsPathToDestFound((int)playerCoord.x, (int)playerCoord.y);
-        if(pathFound)
+        bool pathFound = IsPathToExitFound((int)playerCoord.x, (int)playerCoord.y);
+        PrintPathToExit();
+        if (pathFound)
             NavMeshManager.SetBobsDestination(exitPosition);
         Debug.Log("Path has been found: " + pathFound);
     }
 
-    private bool IsPathToDestFound(int x, int y)
+    private bool IsPathToExitFound(int x, int y)
     {
         if (!InsideBoundaries(x, y) || memoLevel[y][x] == 1)
             return false;
         if (memoLevel[y][x] == 3)
+        {
+            pathToExit.Add(new Vector2(x, y));
             return true;
+        }
 
         memoLevel[y][x] = 1;
-        if (IsPathToDestFound(x + 1, y))
+        if (IsPathToExitFound(x + 1, y))
+        {
+            pathToExit.Add(new Vector2(x, y));
             return true;
-        if (IsPathToDestFound(x, y - 1))
+        }
+        if (IsPathToExitFound(x, y - 1))
+        {
+            pathToExit.Add(new Vector2(x, y));
             return true;
-        if (IsPathToDestFound(x - 1, y))
+        }
+        if (IsPathToExitFound(x - 1, y))
+        {
+            pathToExit.Add(new Vector2(x, y));
             return true;
-        if (IsPathToDestFound(x, y + 1))
+        }
+        if (IsPathToExitFound(x, y + 1))
+        {
+            pathToExit.Add(new Vector2(x, y));
             return true;
+        }
 
         return false;
     }
@@ -213,6 +230,7 @@ public class LevelManager
         Debug.Log("tilesRef.Length before clear: " + tilesRef.Count);
         tilesRef.Clear();
         Debug.Log("tilesRef.Length after clear: " + tilesRef.Count);
+        pathToExit.Clear();
     }
 
     public bool ChangeToNextLevel()
@@ -240,5 +258,14 @@ public class LevelManager
             levelsString += String.Join("|", logicLevel[i]) + "\t" + String.Join("|", memoLevel[i]) + "\n";
 
         Debug.Log("logicLevel:\tmemoLevel:\n" + levelsString);
+    }
+
+    private void PrintPathToExit()
+    {
+        string pathString = "Path to Exit is ";
+        pathToExit.Reverse();
+        foreach (Vector2 coord in pathToExit)
+            pathString += "-> (" + coord.x + "," + coord.y + ") ";
+        Debug.Log(pathString);
     }
 }
