@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System;
+using DG.Tweening;
 
 public class LevelManager
 {
@@ -15,7 +16,8 @@ public class LevelManager
     Vector2 exitCoord;
     Vector2 playerCoord;
     int[][] memoLevel;
-    List<Vector2> pathToExit = new List<Vector2>();
+    float bobMoveAnimDuration = 10.0f;
+    List<(Vector2, Vector3)> pathToExit = new List<(Vector2, Vector3)>();
 
     const int WIDTH = 17;
     const int HEIGHT = 10;
@@ -131,8 +133,7 @@ public class LevelManager
             tilePosition.x = xRoot * offset;
             tilePosition.z -= offset;
         }
-        NavMeshManager.CreateNavMesh();
-
+        //NavMeshManager.CreateNavMesh();
         PrintLogicAndMemoLevels();
     }
 
@@ -162,9 +163,13 @@ public class LevelManager
         CloneMemoLogicLevel();
         PrintLogicAndMemoLevels();
         bool pathFound = IsPathToExitFound((int)playerCoord.x, (int)playerCoord.y);
-        PrintPathToExit();
         if (pathFound)
-            NavMeshManager.SetBobsDestination(exitPosition);
+        {
+            pathToExit.Reverse();
+            PrintPathToExit();
+            AnimateBobPathToExit();
+            //NavMeshManager.SetBobsDestination(exitPosition);
+        }
         Debug.Log("Path has been found: " + pathFound);
     }
 
@@ -174,29 +179,29 @@ public class LevelManager
             return false;
         if (memoLevel[y][x] == 3)
         {
-            pathToExit.Add(new Vector2(x, y));
+            AddPathToExitEdge(x, y);
             return true;
         }
 
         memoLevel[y][x] = 1;
         if (IsPathToExitFound(x + 1, y))
         {
-            pathToExit.Add(new Vector2(x, y));
+            AddPathToExitEdge(x, y);
             return true;
         }
         if (IsPathToExitFound(x, y - 1))
         {
-            pathToExit.Add(new Vector2(x, y));
+            AddPathToExitEdge(x, y);
             return true;
         }
         if (IsPathToExitFound(x - 1, y))
         {
-            pathToExit.Add(new Vector2(x, y));
+            AddPathToExitEdge(x, y);
             return true;
         }
         if (IsPathToExitFound(x, y + 1))
         {
-            pathToExit.Add(new Vector2(x, y));
+            AddPathToExitEdge(x, y);
             return true;
         }
 
@@ -250,6 +255,22 @@ public class LevelManager
         return false;
     }
 
+    private void AddPathToExitEdge(int x, int y)
+    {
+        Vector3 tilePos = GameObject.Find(x + "," + y).transform.position;
+        pathToExit.Add((new Vector2(x, y), tilePos));
+    }
+
+    private void AnimateBobPathToExit()
+    {
+        float bobY = bobRef.transform.position.y;
+        Vector3[] waypoints = new Vector3[pathToExit.Count];
+        int i = 0;
+        foreach ((Vector2, Vector3) coord in pathToExit)
+            waypoints[i++] = new Vector3(coord.Item2.x, bobY, coord.Item2.z);
+        bobRef.transform.DOPath(waypoints, bobMoveAnimDuration, gizmoColor: Color.yellow).SetLookAt(0.015f);
+    }
+
     private void PrintLogicAndMemoLevels()
     {
         string levelsString = "";
@@ -262,10 +283,19 @@ public class LevelManager
 
     private void PrintPathToExit()
     {
-        string pathString = "Path to Exit is ";
-        pathToExit.Reverse();
-        foreach (Vector2 coord in pathToExit)
-            pathString += "-> (" + coord.x + "," + coord.y + ") ";
-        Debug.Log(pathString);
+        if (pathToExit.Count == 0)
+            Debug.Log("Path to Exit not yet found");
+        else
+        {
+            string pathString = "Path to Exit is ";
+            string tilePosString = "Tile Positions are ";
+
+            foreach ((Vector2, Vector3) coord in pathToExit)
+                pathString += "-> (" + coord.Item1.x + "," + coord.Item1.y + ") ";
+            foreach ((Vector2, Vector3) coord in pathToExit)
+                tilePosString += "-> (" + coord.Item2.x + "," + coord.Item2.y + "," + coord.Item2.z + ") ";
+
+            Debug.Log("Bob's position: " + bobRef.transform.position + "\n" + pathString + "\n" + tilePosString);
+        }
     }
 }
