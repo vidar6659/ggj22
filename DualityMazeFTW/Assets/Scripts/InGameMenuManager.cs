@@ -59,4 +59,10 @@ public class InGameMenuManager : MonoBehaviour
         Game.SetLevelPauseStatus(false);
         Game.SetLevelIsCompleted(false);
     }
+
+    public void ResetLevel()
+    {
+        GameObject.Find("GameManager").GetComponent<Game>().ResetLevel();
+        LoadInGamePanel();
+    }
 }

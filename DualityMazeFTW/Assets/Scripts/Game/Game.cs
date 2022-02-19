@@ -13,13 +13,14 @@ public class Game : MonoBehaviour
     public Material mirrorTileMat;
     public static bool isGamePaused = false;
     public static bool isLevelCompleted = false;
+    public static bool isPathfound = false;
 
     public int numberOfLevels;
 
     void Start()
     {
         levelManager = new LevelManager(numberOfLevels);
-        levelManager.LoadLevel();
+        levelManager.LoadLevel(true);
         levelManager.CreateLevel(tilePrefab, bobPrefab, exitPrefab, mirrorTileMat);
         player = new Player(levelManager);
     }
@@ -62,5 +63,11 @@ public class Game : MonoBehaviour
     public void NextLevel()
     {
         levelManager.ChangeToNextLevel();
+    }
+
+    public void ResetLevel()
+    {
+        Debug.Log("reset level");
+        levelManager.ResetLevel();
     }
 }

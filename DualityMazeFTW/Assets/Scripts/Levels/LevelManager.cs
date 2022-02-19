@@ -55,7 +55,7 @@ public class LevelManager
         path = Application.dataPath + "/levels/lvl_" + zeros + indexLevels + ".txt";
     }
 
-    public void LoadLevel()
+    public void LoadLevel(bool incrementIndexLevel)
     {
         if (File.Exists(path))
         {
@@ -74,7 +74,8 @@ public class LevelManager
             }
             SetInitialPosition();
         }
-        indexLevels++;
+        if(incrementIndexLevel)
+            indexLevels++;
     }
 
     private void SetInitialPosition()
@@ -165,6 +166,7 @@ public class LevelManager
         bool pathFound = IsPathToExitFound((int)playerCoord.x, (int)playerCoord.y);
         if (pathFound)
         {
+            Game.isPathfound = true;
             pathToExit.Reverse();
             PrintPathToExit();
             AnimateBobPathToExit();
@@ -244,7 +246,7 @@ public class LevelManager
         {
             ClearLevel();
             ChangeFile();
-            LoadLevel();
+            LoadLevel(true);
             CreateLevel(tilePrefab, bobPrefab, exitPrefab, mirrorTileMat);
             return true;
         }
@@ -297,5 +299,12 @@ public class LevelManager
 
             Debug.Log("Bob's position: " + bobRef.transform.position + "\n" + pathString + "\n" + tilePosString);
         }
+    }
+
+    public void ResetLevel()
+    {
+        ClearLevel();
+        LoadLevel(false);
+        CreateLevel(tilePrefab, bobPrefab, exitPrefab, mirrorTileMat);
     }
 }
