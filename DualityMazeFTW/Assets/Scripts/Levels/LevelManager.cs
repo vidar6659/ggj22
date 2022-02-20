@@ -117,6 +117,7 @@ public class LevelManager
                     playerCoord.x = j;
                     playerCoord.y = i;
                     bobRef = bob;
+                    tile.GetComponent<Tile>().isStart = true;
                 }
                 else if (logicLevel[i][j] == 3) //exit
                 {
@@ -128,6 +129,7 @@ public class LevelManager
                     exitCoord.x = j;
                     exitCoord.y = i;
                     exitRef = exit;
+                    tile.GetComponent<Tile>().isExit = true;
                 }
                 tilePosition.x += offset;
             }
@@ -166,7 +168,7 @@ public class LevelManager
         bool pathFound = IsPathToExitFound((int)playerCoord.x, (int)playerCoord.y);
         if (pathFound)
         {
-            Game.isPathfound = true;
+            Game.isPathFound = true;
             pathToExit.Reverse();
             PrintPathToExit();
             AnimateBobPathToExit();
@@ -306,5 +308,18 @@ public class LevelManager
         ClearLevel();
         LoadLevel(false);
         CreateLevel(tilePrefab, bobPrefab, exitPrefab, mirrorTileMat);
+    }
+
+    public bool CheckIfTileIsInteractive(Vector2 coord)
+    {
+        if (logicLevel[(int)coord.y][(int)coord.x] == 2 ||
+            logicLevel[(int)coord.y][(int)coord.x] == 3)
+            return false;
+        //Check mirror tile
+        int mX = levelWidth - ((int)coord.x + 1);
+        if (logicLevel[(int)coord.y][mX] == 2 ||
+            logicLevel[(int)coord.y][mX] == 3)
+            return false;
+        return true;
     }
 }

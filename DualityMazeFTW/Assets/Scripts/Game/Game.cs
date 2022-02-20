@@ -13,7 +13,7 @@ public class Game : MonoBehaviour
     public Material mirrorTileMat;
     public static bool isGamePaused = false;
     public static bool isLevelCompleted = false;
-    public static bool isPathfound = false;
+    public static bool isPathFound = false;
 
     public int numberOfLevels;
 
@@ -62,12 +62,14 @@ public class Game : MonoBehaviour
 
     public void NextLevel()
     {
+        isPathFound = false;
         levelManager.ChangeToNextLevel();
     }
 
     public void ResetLevel()
     {
         Debug.Log("reset level");
+        isPathFound = false;
         levelManager.ResetLevel();
     }
 }

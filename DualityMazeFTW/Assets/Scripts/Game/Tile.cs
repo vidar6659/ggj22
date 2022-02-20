@@ -6,6 +6,8 @@ public class Tile : MonoBehaviour
 {
     public Vector2 coord;
     public bool isBlock;
+    public bool isExit = false;
+    public bool isStart = false;
 
     void Start()
     {
